@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cron } from "croner";
+import dingSound from './ding.mp3';
 
 const App = () => {
   const [slackId, setSlackId] = useState('');
@@ -76,7 +77,10 @@ const App = () => {
       console.error('Error:', error);
     }
   };
-
+  const playDingSound = () => {
+    const audio = new Audio(dingSound);
+    audio.play();
+  };
   const updateTimer = (endTime) => {
     console.log('Updating timer with end time:', new Date(endTime).toLocaleString());
     const interval = setInterval(() => {
@@ -90,10 +94,14 @@ const App = () => {
         console.log('Session ended.');
         return;
       }
-      setTimeLeft(remaining);
-    }, 1000);
-    setIntervalId(interval);
-  };
+
+      // Check if it's 5 minutes before the end of each hour
+      const minutesRemaining = Math.floor(remaining / 1000 / 60);
+      if (minutesRemaining === 5) {
+        playDingSound();
+      }
+    });
+};
 
   const formatTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
