@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import schedule from 'node-schedule'; // Import node-schedule
+
 
 const App = () => {
   const [slackId, setSlackId] = useState('');
@@ -36,21 +38,23 @@ const App = () => {
     console.log('Initial API call to start the session');
     callApi('/api/start/:slackId', { work: topic });
 
-    const sessionInterval = setInterval(() => {
+    // Schedule job to call API every hour and 2 seconds
+    const job = schedule.scheduleJob('2 * * * * *', () => {
       console.log('API call to continue the session');
       callApi('/api/start/:slackId', { work: topic });
-    }, 60 * 60 * 1000 + 2000); // Every hour and 2 seconds
+    });
 
     const finalTimeout = setTimeout(() => {
-      clearInterval(sessionInterval);
+      job.cancel(); // Cancel the scheduled job
       callApi('/api/end/:slackId', {});
       setIsRunning(false);
       setTimeLeft(0);
       console.log('Final API call to end the session');
     }, endTime - Date.now());
 
-    setSessionIntervalId({ sessionInterval, finalTimeout });
+    setSessionIntervalId({ job, finalTimeout });
   };
+
 
   const callApi = async (endpoint, data) => {
     const url = `${endpoint.replace(':slackId', slackId)}`;
