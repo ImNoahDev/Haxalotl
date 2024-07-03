@@ -39,7 +39,7 @@ const App = () => {
     callApi('/api/start/:slackId', { work: topic });
 
     // Schedule job to call API every hour and 2 seconds
-    const job = Cron('2 * * * * *', () => {
+    const job = Cron('2 0 * * * *', () => {
       console.log('API call to continue the session');
       callApi('/api/start/:slackId', { work: topic });
     });
