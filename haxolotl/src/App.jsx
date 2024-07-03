@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import schedule from 'node-schedule'; // Import node-schedule
-
+import { Cron } from "croner";
 
 const App = () => {
   const [slackId, setSlackId] = useState('');
@@ -39,13 +38,13 @@ const App = () => {
     callApi('/api/start/:slackId', { work: topic });
 
     // Schedule job to call API every hour and 2 seconds
-    const job = schedule.scheduleJob('2 * * * * *', () => {
+    const job = Cron('2 * * * * *', () => {
       console.log('API call to continue the session');
       callApi('/api/start/:slackId', { work: topic });
     });
 
     const finalTimeout = setTimeout(() => {
-      job.cancel(); // Cancel the scheduled job
+      job.stop(); // Cancel the scheduled job
       callApi('/api/end/:slackId', {});
       setIsRunning(false);
       setTimeLeft(0);
