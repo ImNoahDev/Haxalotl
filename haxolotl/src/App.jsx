@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cron } from "croner";
-import dingSound from './ding.mp3';
+import dingSound from '/ding.mp3';
 
 const App = () => {
   const [slackId, setSlackId] = useState('');
